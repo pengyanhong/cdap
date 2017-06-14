@@ -624,6 +624,7 @@ features:
       invalidFieldNameRemedies2: "You can try to "
       cleanseLinkLabel: "cleanse "
       invalidFieldNameRemedies3: column names.
+      kafka: Kafka
       SchemaModal:
         defaultErrorMessage: Error generating schema.
       PipelineModal:

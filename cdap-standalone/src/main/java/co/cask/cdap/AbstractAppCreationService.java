@@ -101,9 +101,14 @@ class AbstractAppCreationService extends AbstractExecutionThreadService {
       List<ArtifactSummary> artifacts = new ArrayList<>(artifactRepository.getArtifactSummaries(
         NamespaceId.SYSTEM, artifactName, Integer.MAX_VALUE, ArtifactSortOrder.DESC));
 
-      // Get all artifacts present in the user scope
-      List<ArtifactSummary> userArtifacts = new ArrayList<>(artifactRepository.getArtifactSummaries(
-        appId.getNamespaceId(), artifactName, Integer.MAX_VALUE, ArtifactSortOrder.DESC));
+      // Get all artifacts present in the user scope if it exists
+      List<ArtifactSummary> userArtifacts = new ArrayList<>();
+      try {
+        userArtifacts.addAll(artifactRepository.getArtifactSummaries(
+          appId.getNamespaceId(), artifactName, Integer.MAX_VALUE, ArtifactSortOrder.DESC));
+      } catch (ArtifactNotFoundException ex) {
+        // expected if no user artifact is present, hence suppress it.
+      }
 
       ArtifactSummary highestSystemArtifact = artifacts.get(0);
       ArtifactSummary highestUserArtifact = userArtifacts.size() > 0 ? userArtifacts.get(0) : null;

@@ -110,23 +110,22 @@ class AbstractAppCreationService extends AbstractExecutionThreadService {
         // expected if no user artifact is present, hence suppress it.
       }
 
-      ArtifactSummary highestSystemArtifact = artifacts.get(0);
-      ArtifactSummary highestUserArtifact = userArtifacts.size() > 0 ? userArtifacts.get(0) : null;
+      artifacts.addAll(userArtifacts);
+      ArtifactSummary maxSummary = artifacts.get(0);
 
-      // If the user artifact version is higher, use that instead of the system artifact
-      ArtifactSummary highestArtifact = highestSystemArtifact;
-      if (highestUserArtifact != null) {
-        ArtifactVersion userVersion = new ArtifactVersion(highestUserArtifact.getVersion());
-        ArtifactVersion systemVersion = new ArtifactVersion(highestArtifact.getVersion());
-        if (userVersion.compareTo(systemVersion) > 0) {
-          highestArtifact = highestUserArtifact;
+      // Find the artifact with the highest artifact version
+      for (ArtifactSummary currentSummary : artifacts) {
+        ArtifactVersion currentVersion = new ArtifactVersion(currentSummary.getVersion());
+        ArtifactVersion maxVersion = new ArtifactVersion(maxSummary.getVersion());
+        if (currentVersion.compareTo(maxVersion) > 0) {
+          maxSummary = currentSummary;
         }
       }
 
       if (stopping) {
         LOG.debug("{} AppCreationService is shutting down.", appId.getApplication());
       }
-      createAppAndStartProgram(highestArtifact);
+      createAppAndStartProgram(maxSummary);
     } catch (Exception ex) {
       // Not able to create application. But it is not catastrophic, hence just log a warning.
       LOG.warn("Got an exception while trying to create and start {} app.", appId, ex);
